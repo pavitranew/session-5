@@ -26,7 +26,7 @@ Note the dependencies.
   }
 ```
 
-We'll be using [Babel](https://babeljs.io/docs/setup/#installation) with [Webpack](https://webpack.js.org) using the basic concepts presented [here](https://webpack.js.org/concepts/).
+We'll be using [Babel](https://babeljs.io) with [Webpack](https://webpack.js.org) using the basic concepts presented [here](https://webpack.js.org/concepts/).
 
 Create `webpack.config.js`:
 
@@ -44,7 +44,7 @@ module.exports = {
 };
 ```
 
-Create `src/index.js`
+In `src/index.js`
 
 ```js
 const getMessage = () => 'Hello World';
@@ -61,11 +61,15 @@ Note Webpack in our scripts:
   },
 ```
 
+Note the settings in `app.js`.
+
 `npm run boom!`
 
-Review `bundle.js` and map.
+Review `index.html`, `bundle.js` and note the `bundle.js.map`.
 
-Add Babel to Webpack:
+I'll be following these instructions for adding [Babel](https://webpack.js.org/loaders/babel-loader/#src/components/Sidebar/Sidebar.jsx) to Webpack.
+
+Note the change from `mode: 'production',` to `mode: 'development',` below:
 
 ```js
 const path = require('path');
@@ -95,7 +99,9 @@ module.exports = {
 };
 ```
 
-Restart the server and view `http://localhost:3001/`.
+Restart the server with `boom!` and view `http://localhost:3001/`.
+
+One of the best resources for Webpack is the book at[survivejs](https://survivejs.com).
 
 ## ES6 Modules
 
@@ -105,9 +111,9 @@ We have seen CommonJS Modules in Node and are already using [them](https://nodej
 
 The other important module architecture, ES6 modules, is not natively supported in the browser so we need to bundle them together. Having installed Webpack for bundling we can now use native [ES6 modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import).
 
-### ES6 Module Exports and Imports
+### ES6 Module Syntax
 
-Create `src/config.js`.
+Create `src/test.js`.
 
 Exporting data - using _default_ exports:
 
@@ -120,11 +126,11 @@ export default apiKey;
 Import it into `index.js` (note: paths are not necessary for node modules):
 
 ```js
-import apiKey from './config';
+import apiKey from './test';
 console.log(apiKey);
 ```
 
-(The path is relative to the root established in webpack.config.)
+(The path './test' is relative to the root established in `webpack.config.js`.)
 
 Refresh the browser. Note the new variable in the browser's console.
 
@@ -133,20 +139,20 @@ Because we exported it as default we can rename on import.
 In `index.js`:
 
 ```js
-import foo from './config';
+import foo from './test';
 console.log(foo);
 ```
 
 ES6 Modules can only have one default export but _can_ have multiple named exports.
 
-A _named_ export in `config.js`:
+A _named_ export in `test.js`:
 
 `export const apiKey = 'abcdef';`
 
 requires an import that selects it in `index.js`:
 
 ```js
-import { apiKey } from './config';
+import { apiKey } from './test';
 console.log(apiKey);
 ```
 
@@ -158,7 +164,7 @@ export const url = 'https://mlab.com';
 ```
 
 ```js
-import { apiKey, url } from './config';
+import { apiKey, url } from './test';
 console.log(apiKey, url);
 ```
 
@@ -176,7 +182,7 @@ export function sayHi(name) {
 ```
 
 ```js
-import { apiKey, url, sayHi } from './config';
+import { apiKey, url, sayHi } from './test';
 sayHi('daniel');
 ```
 
@@ -186,7 +192,7 @@ Review [the documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScri
 
 Let's look at using an older - but still common and actively maintained - version of Angular as our page templating language. Documentation for the features we will be using is located [here](https://docs.angularjs.org/guide).
 
-Edit `index.html` page in public:
+Delete the contents of `index.js` and edit `index.html` page in public:
 
 ```html
 <!DOCTYPE html>
@@ -218,10 +224,11 @@ Note the npm installs for Angular:
   },
 ```
 
-Back in the 'old' days you would use the `<script>` tag, e.g.:
-`<script src="https://code.angularjs.org/1.5.8/angular.js"></script>`
+Back in the 'old' days you would use `<script>` tags to access libraries etc., e.g.:
 
-Since we are using bundling we use ES6 imports.
+`<script src="https://code.angularjs.org/1.6.2/angular.js"></script>`
+
+Since we are bundling we use ES6 imports and our installed packages in `node_modules`.
 
 Import angular and angular routing into `index.js`:
 
@@ -230,34 +237,40 @@ import angular from 'angular';
 import ngRoute from 'angular-route';
 ```
 
-Note that your bundle just got very large.
+(Note that your bundle just got very large.)
 
-## Angular Recipe Site
-
-### Concepts
+### Important AngularJS Concepts
 
 [Wikipedia](https://en.wikipedia.org/wiki/AngularJS) article on Angular.
 
 ```html
+<body>
   <div class="site-wrap" ng-app="myApp" >
     <div ng-controller="myCtrl">
       Name: <input ng-model="name">
       <p>{{ name }}</p>
     </div>
   </div>
+</body>
 ```
 
+`index.js`:
+
 ```js
+import angular from 'angular';
+import ngRoute from 'angular-route';
+
 const app = angular.module('myApp', []);
 
 app.controller('myCtrl', $scope => ($scope.name = 'John Doe'));
 ```
 
-* AngularJS vs Angular
+* [MVC](https://en.wikipedia.org/wiki/Model–view–controller) - Model, View, Controller
 * `{{ }}` - "moustaches" or "handlebars" the evaluate to a value
-* `$scope` - the "glue" between application controller and the view.
+* `$scope` - the "glue" between application controller and the view
+* AngularJS vs Angular
 
-In `index.js` (after the import statements):
+Edit `index.js` (after the import statements):
 
 ```js
 const app = angular.module('foodApp', ['ngRoute']);
@@ -279,8 +292,10 @@ Create the first component:
 
 ```js
 app.component('recipeList', {
-  template: `<div class="wrap"><h1>Recipe List component</h1></div>`,
-  controller: function RecipeListController() {}
+  template: `<div class="wrap"><h1>{{ name }} component</h1></div>`,
+  controller: function RecipeListController($scope) {
+    $scope.name = 'Recipe List'
+  }
 });
 ```
 
@@ -293,6 +308,8 @@ Display the component in the view:
   </div>
 </body>
 ```
+
+
 
 Add a template and data to the controller:
 
