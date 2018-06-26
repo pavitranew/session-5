@@ -101,7 +101,7 @@ module.exports = {
 
 Restart the server with `boom!` and view `http://localhost:3001/`.
 
-One of the best resources for Webpack is the book at[survivejs](https://survivejs.com).
+One of the best resources for Webpack is the book at [survivejs](https://survivejs.com).
 
 ## ES6 Modules
 
@@ -109,7 +109,7 @@ One of the best resources for Webpack is the book at[survivejs](https://survivej
 
 We have seen CommonJS Modules in Node and are already using [them](https://nodejs.org/api/modules.html) in our projects. The `exports` and `require` statements working within our app are CommonJS Modules.
 
-The other important module architecture, ES6 modules, is not natively supported in the browser so we need to bundle them together. Having installed Webpack for bundling we can now use native [ES6 modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import).
+ES6 modules are not natively supported in the browser so we need to bundle them. Having installed Webpack for bundling we can now use [them](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import).
 
 ### ES6 Module Syntax
 
@@ -134,7 +134,7 @@ console.log(apiKey);
 
 Refresh the browser. Note the new variable in the browser's console.
 
-Because we exported it as default we can rename on import.
+Because we exported it as default we can rename on import if need be.
 
 In `index.js`:
 
@@ -156,18 +156,6 @@ import { apiKey } from './test';
 console.log(apiKey);
 ```
 
-Multiple named exports:
-
-```js
-export const apiKey = 'abcdef';
-export const url = 'https://mlab.com';
-```
-
-```js
-import { apiKey, url } from './test';
-console.log(apiKey, url);
-```
-
 Multiple named exports encourage code encapsulation and reuse across multiple projects.
 
 Functions can be internal to a module or exported:
@@ -182,8 +170,9 @@ export function sayHi(name) {
 ```
 
 ```js
-import { apiKey, url, sayHi } from './test';
+import { apiKey as foo, url, sayHi } from './test';
 sayHi('daniel');
+console.log(foo, url);
 ```
 
 Review [the documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export) on MDN for options including `import as`, `export as` and exporting multiples.
@@ -260,7 +249,7 @@ import ngRoute from 'angular-route';
 import angular from 'angular';
 import ngRoute from 'angular-route';
 
-const app = angular.module('myApp', []);
+const app = angular.module('foodApp', ['ngRoute']);
 
 app.controller('myCtrl', $scope => ($scope.name = 'John Doe'));
 ```
@@ -268,19 +257,17 @@ app.controller('myCtrl', $scope => ($scope.name = 'John Doe'));
 * [MVC](https://en.wikipedia.org/wiki/Model–view–controller) - Model, View, Controller
 * `{{ }}` - "moustaches" or "handlebars" the evaluate to a value
 * `$scope` - the "glue" between application controller and the view
+* ng-model (ng-repeat etc.) is an Angular [directive](https://docs.angularjs.org/api/ng/directive)
 * AngularJS vs Angular
-
-Edit `index.js` (after the import statements):
+* Dependency injection:
 
 ```js
 const app = angular.module('foodApp', ['ngRoute']);
 ```
 
-Note - dependency injection.
+(`ngRoute` supplants Express routes for handling front end views. Always include a single route in Express for your SPA page, here `index.html`. Angular routes handle the view (templates) and the logic (controllers) for the views.)
 
-(`ngSRoute` supplants Express routes for handling front end views. Always include a single route in Express for your SPA page, here `index.html`. Angular routes handle the view (templates) and the logic (controllers) for the views.)
-
-Bootstrap the app in `index.html`:
+Bootstrap the app in `index.html` for our new Recipes app:
 
 ```html
 <body ng-app="foodApp">
@@ -309,7 +296,16 @@ Display the component in the view:
 </body>
 ```
 
+Demo - sample second component:
 
+```js
+app.component('dogFood', {
+  template: `<div class="wrap"><h1> {{ name }} component</h1></div>`,
+  controller: function RecipeListController($scope) {
+    $scope.name = 'Dog Food'
+  }
+});
+```
 
 Add a template and data to the controller:
 
@@ -367,8 +363,6 @@ app.component('recipeList', {
   }
 });
 ```
-
-Note `$ctrl.recipes`.
 
 Move the template html into a separate file in a new folder: `static > templates > recipes.html`
 
@@ -440,7 +434,7 @@ In `_recipes.scss`:
 
 ### Routing and Multiple Components
 
-Create our first Angular route:
+Create our first route using [Angular's ngRoute](https://docs.angularjs.org/api/ngRoute):
 
 ```js
 app.config(function config($locationProvider, $routeProvider) {
@@ -450,6 +444,8 @@ app.config(function config($locationProvider, $routeProvider) {
   $locationProvider.html5Mode(true);
 });
 ```
+
+Note the `$`'s. These are [services](https://docs.angularjs.org/api/ng/service) and are made available to a function by declaring them.
 
 Add in the head of index.html:
 
@@ -475,7 +471,11 @@ And add the template to our Angular route:
 app.config(function config($locationProvider, $routeProvider) {
   $routeProvider
     .when('/', {
-      template: ''
+      template: `
+      <div class="wrap">
+        <h1>Home</h1>
+      </div>
+      `
     })
     .when('/recipes', {
       template: '<recipe-list></recipe-list>'
@@ -490,7 +490,7 @@ Test the route. (Note the routes in Express - `app.js`.)
 
 Using: `ng-class`
 
-Create a new controller in `myapp`:
+Create a new controller in `index.js`:
 
 ```js
 app.controller('NavController', function($scope, $location) {
@@ -588,7 +588,44 @@ nav {
   flex: 2;
   font-size: 1.5em;
 }
+```
 
+Optional - create a component for the navbar.
+
+```js
+app.component('navList', {
+  templateUrl: '/templates/navigation.html',
+  controller: function NavController($scope, $location) {
+    $scope.isActive = function(viewLocation) {
+      var active = viewLocation === $location.path();
+      return active;
+    };
+  }
+})
+```
+
+Remove the reference to controller in the html template:
+
+```html
+<nav>
+  <div class="panels">
+    <div class="panel panel1" ng-class="{ active: isActive('/') }">
+      <a href="/">Home</a>
+    </div>
+    <div class="panel panel2" ng-class="{ active: isActive('/recipes') }">
+      <a href="/recipes">Recipes</a>
+    </div>
+    <div class="panel panel3" ng-class="{ active: isActive('/reviews') }">
+      <a href="/reviews">Reviews</a>
+    </div>
+    <div class="panel panel4" ng-class="{ active: isActive('/delivery') }">
+      <a href="/delivery">Delivery</a>
+    </div>
+    <div class="panel panel5" ng-class="{ active: isActive('/about') }">
+      <a href="/about">About</a>
+    </div>
+  </div>
+</nav>
 ```
 
 ### $HTTP
@@ -598,11 +635,8 @@ Let's use the api instead of keeping the data model in the controller.
 We fetch the dataset from our server using Angular's built-in [$http](https://docs.angularjs.org/api/ng/service/$http) service.
 
 * a core (built into Angular) service that facilitates communication with the remote HTTP servers
-* need to make it available to the recipeList component's controller via [dependency injection](https://docs.angularjs.org/guide/di).
-
-Make $http available to the recipe list controller:
-
-`controller: function RecipeListController($http) { ...`
+* need to make it available to the recipeList component's controller via [dependency injection](https://docs.angularjs.org/guide/di)
+* AngularJS predates `fetch`
 
 Use `get` method with `$http` to fetch the json from the data folder:
 
@@ -618,13 +652,13 @@ app.component('recipeList', {
 });
 ```
 
-Change
+In `recipes.html`. change:
 
 ```html
 <li ng-repeat="recipe in $ctrl.recipes">
 ```
 
-to
+to:
 
 ```html
 <li ng-repeat="recipe in recipes">
@@ -654,7 +688,7 @@ Edit the ng-repeat:
 
 `<li ng-repeat="recipe in recipes | filter:query | orderBy:orderProp">`
 
-Add a line to the controller that sets the default value of `orderProp` to `date`. If do not set a default value here, the `orderBy` filter will remain uninitialized until the user picks an option from the drop-down menu.
+Add a line to the controller that sets the default value of `orderProp` to `date`. If you do not set a default value here, the `orderBy` filter will remain uninitialized until the user picks an option from the drop-down menu.
 
 `this.orderProp = 'date';`:
 
@@ -688,11 +722,9 @@ Note the `recipe.._id` expression in the anchor tag:
 
 Clicking on the individual recipe shows a parameter in the browser's location bar. We do not have routes set up for these yet.
 
-### Recall
+A module's `.config()` method gives us access to tools for configuration.
 
-A module's .config() method gives us access to tools for configuration.
-
-To make the providers, services and directives defined in ngRoute available to our application, we added ngRoute as a dependency to our foodApp module:
+To make the providers, services and directives defined in `ngRoute` available to our application, we added ngRoute as a dependency to our foodApp module:
 
 ```js
 angular.module('foodApp', ['ngRoute']);
@@ -700,7 +732,7 @@ angular.module('foodApp', ['ngRoute']);
 
 Application routes in Angular are declared via `$routeProvider`. This service makes it easy to wire together controllers, view templates, and the current URL location in the browser.
 
-Add a route in `myapp.js` for the new recipe links:
+Add a route in `index.js` for the new recipe links:
 
 ```js
 app.config(function config($locationProvider, $routeProvider) {
@@ -720,7 +752,7 @@ app.config(function config($locationProvider, $routeProvider) {
 
 All variables defined with the `:` prefix are extracted into a (injectable) `$routeParams` object.
 
-We inject the routeParams service of ngRoute into our controller so that we can extract the recipeId and use it in our stub.
+We inject the routeParams service of `ngRoute` into our controller so that we can extract the recipeId and use it in our stub.
 
 ```js
 app.component('recipeDetail', {
@@ -741,13 +773,13 @@ Create `templates/recipe.html`:
 ```html
 <div class="wrap">
 
-    <h1>{{ $ctrl.recipe.title }}</h1>
+    <h1>{{ recipe.title }}</h1>
 
-    <p>{{ $ctrl.recipe.description }}</p>
+    <p>{{ recipe.description }}</p>
 
     <h3>Ingredients</h3>
     <ul class="ingredients">
-        <li ng-repeat="ingredient in $ctrl.recipe.ingredients">
+        <li ng-repeat="ingredient in recipe.ingredients">
             {{ ingredient }}
         </li>
     </ul>
@@ -758,15 +790,14 @@ Create `templates/recipe.html`:
 Edit the component to use `templateUrl`:
 
 ```js
-app.component('recipeDetail', {
   templateUrl: '/templates/recipe.html',
-  ...
-})
 ```
 
-Add `$http` to the dependency list for our controller so we can access the api"
+Add:
 
-`controller: function RecipeDetailController($http, $routeParams, $scope) {`
+* `$http` to the dependency list for our controller so we can access the api, 
+* `$routeParams` so we can access the id in the url, and
+* `$scope` so we can make the results of the api call accessible to the view
 
 and use a function to load the data:
 
@@ -778,79 +809,6 @@ and use a function to load the data:
     });
   }
 ```
-
-<!-- ## Adding an Image
-
-Implement an image switcher within our recipe details component.
-
-Note this entry in recipe1309.json: `"mainImageUrl": "lasagna-1.png",`
-
-Add to the template after the header:
-
-`<img ng-src="img/home/{{ $ctrl.recipe.mainImageUrl }}" />`
-
-We are creating an image switcher so we will create a new function in the recipe-detail component:
-
-```js
-controller: function RecipeDetailController($http, $routeParams) {
-  $http.get('data/' + $routeParams.recipeId + '.json').then(response => {
-    this.recipe = response.data;
-  });
-  this.setImage = imageUrl => (this.mainImageUrl = imageUrl);
-}
-```
-
-Followed by a call to the function _in the promise function_ to initialize the first image:
-
-```js
-controller: function RecipeDetailController($http, $routeParams) {
-  $http.get('data/' + $routeParams.recipeId + '.json').then(response => {
-    this.recipe = response.data;
-    this.setImage(this.recipe.images[3]);
-  });
-  this.setImage = imageUrl => (this.mainImageUrl = imageUrl);
-}
-```
-
-Note: changing the index in the setImage call doesn't work yet.
-
-And make the following change to the template, adding a class for styling and a source which uses the `mainImageUrl` variable we created in the controller:
-
-`<img ng-src="img/home/{{$ctrl.mainImageUrl}}" class="recipe-detail-image" />`
-
-(Note: we no longer need `"mainImageUrl": "images/home/lasagna-1.png",` in the json since we are now refering to the images array.)
-
-### ng-click
-
-Add a list of images to the template that we will click on to swap out the main image.
-
-Note the `ng-click` directive and its call to the setImage function we created earlier (this goes below the img tag):
-
-```html
-<ul class="recipe-thumbs">
-    <li ng-repeat="img in $ctrl.recipe.images">
-        <img ng-src="img/home/{{img}}" ng-click="$ctrl.setImage(img)" />
-    </li>
-</ul>
-```
-
-You should now be able to click on one of the images in the list to swap out the main image.
-
-Final refactored component:
-
-```js
-app.component('recipeDetail', {
-  templateUrl: '/includes/recipe.html',
-
-  controller: function RecipeDetailController($http, $routeParams) {
-    $http.get('data/' + $routeParams.recipeId + '.json').then(response => {
-      this.recipe = response.data;
-      this.setImage(this.recipe.images[3]);
-    });
-    this.setImage = imageUrl => (this.mainImageUrl = imageUrl);
-  }
-});
-``` -->
 
 ### Deleting a Recipe
 
@@ -892,7 +850,7 @@ Use the api:
     $scope.deleteRecipe = recipeid => $http.delete('/api/recipes/' + recipeid);
 ```
 
-Clicking on an X will remove a recipe but you need to refresh to see the result. It has no effect on the view ($scope).
+Clicking on an `✖︎` will remove a recipe but you need to refresh to see the result. It has no effect on the view ($scope).
 
 Pass the `index` of the selected recipe to the function:
 
@@ -906,7 +864,8 @@ Catch the index in the function (`(index, recipeid)`) and call `then` on it to `
 
 ```js
 $scope.deleteRecipe = (index, recipeid) =>
-    $http.delete(`/api/recipes/${recipeid}`).then(() => $scope.recipes.splice(index, 1));
+    $http.delete(`/api/recipes/${recipeid}`)
+    .then(() => $scope.recipes.splice(index, 1));
 ```
 
 Changes to the db persist and are relected in the view.
@@ -979,63 +938,7 @@ ul li:nth-child(odd) {
 }
 ```
 
-Delete all your recipes and navigate to `http://localhost:3001/api/import` to re-import them.
-
-#### Update a Recipe
-
-`put` HTTP actions in a REST API correlate to an Update method.
-
-The route for Update also uses an `:id` parameter.
-
-In `recipe.controllers.js`:
-
-```js
-exports.update = function(req, res) {
-    const id = req.params.id;
-    const updates = req.body;
-
-    Recipe.update({ _id: id }, updates, function(err) {
-        if (err) return console.log(err);
-        return res.sendStatus(202);
-    });
-};
-```
-
-Notice the updates variable storing the `req.body`. `req.body` is useful when you want to pass in larger chunks of data like a single JSON object. Here we will pass in a JSON object (following the schema) of only the model's properties you want to change.
-
-The model's update() takes three parameters:
-
-* JSON object of matching properties to look up the doc with to update
-* JSON object of just the properties to update
-* callback function that returns any errors
-
-### Test with Curl
-
-We will need to construct this line using ids from the recipes listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target recipe:
-
-(Check the below for proper URL - it changes depending on the port in use as well as the id.)
-
-```sh
-curl -i -X PUT -H 'Content-Type: application/json' -d '{"title": "Big Mac"}' http://localhost:3010/api/recipes/5ada0fe0b558ca58bf651406
-```
-
-This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the recipe we want to update.
-
-Visit the same URL from the cURL request in the browser to see the changes.
-
-PUT actions are cumbersome to test in the browser, so we'll use Postman to run through the process of editing a recipe above.
-
-1: Set the action to put and the url to a single entry with an id.
-
-2: Set the body to `raw` and the `text` header to application/json
-
-3: put `{ "name": "Toast", "image": "toast.jpg", "description": "Tasty!" }`
-
-4: Test to see changes
-
-## Adding Forms to Interface With Our API
-
-### Add Recipe
+## Adding a Recipe
 
 1: Add a form to the recipes template:
 
@@ -1086,7 +989,7 @@ app.component('recipeList', {
 
 3: Test by adding a recipe
 
-Note the lack of an id and the persistance of the form elements. Edit the push to use the data returned by the response:
+Edit the push to use the data returned by the response:
 
 ```js
 $scope.addRecipe = function(data) {
@@ -1107,21 +1010,21 @@ app.component('recipeList', {
     $http.get('api/recipes').then( res => {
       $scope.recipes = res.data;
     });
-    
+
     $scope.orderProp = 'date';
-    
+
     $scope.deleteRecipe = (index, recipeid) => {
       console.log(index, recipeid)
       $http.delete(`/api/recipes/${recipeid}`)
       .then ($scope.recipes.splice(index, 1));
     }
-    
+
     $scope.addRecipe = function(data) {
       $http.post('/api/recipes/', data).then(() => {
         $scope.recipes.push(data);
       });
     };
-    
+
   }
 });
 ```
@@ -1148,6 +1051,59 @@ app.component('recipeList', {
     }
 });
 ``` -->
+
+### Update a Recipe
+
+`put` HTTP actions in a REST API correlate to an Update method.
+
+The route for Update also uses an `:id` parameter.
+
+In `recipe.controllers.js`:
+
+```js
+exports.update = function(req, res) {
+    const id = req.params.id;
+    const updates = req.body;
+
+    Recipe.update({ _id: id }, updates, function(err) {
+        if (err) return console.log(err);
+        return res.sendStatus(202);
+    });
+};
+```
+
+Notice the updates variable storing the `req.body`. `req.body` is useful when you want to pass in larger chunks of data like a single JSON object. Here we will pass in a JSON object (following the schema) of only the model's properties you want to change.
+
+The model's update() takes three parameters:
+
+* JSON object of matching properties to look up the doc with to update
+* JSON object of just the properties to update
+* callback function that returns any errors
+
+### Test with Curl
+
+We will need to construct this line using ids from the recipes listing and test it in a new Terminal tab. Edit the URL to reflect both the port and id of the target recipe:
+
+(Check the below for proper URL - it changes depending on the port in use as well as the id.)
+
+```sh
+curl -i -X PUT -H 'Content-Type: application/json' -d '{"title": "Big Mac"}' http://localhost:3002/api/recipes/5b32895059ea391966aa3825
+
+```
+
+This sends a JSON Content-Type PUT request to our update endpoint. That JSON object is the request body, and the long hash at the end of the URL is the id of the recipe we want to update.
+
+Visit the same URL from the cURL request in the browser to see the changes.
+
+PUT actions are cumbersome to test in the browser, so we'll use Postman to run through the process of editing a recipe above.
+
+1: Set the action to put and the url to a single entry with an id.
+
+2: Set the body to `raw` and the `text` header to application/json
+
+3: put `{ "title": "Toast", "image": "toast.jpg", "description": "Tasty!" }`
+
+4: Test to see changes
 
 ### Edit Recipe Detail Template
 
@@ -1253,8 +1209,8 @@ app.component('recipeDetail', {
 Toggling the editor interface:
 
 ```js
-this.editorEnabled = false;
-this.toggleEditor = () => (this.editorEnabled = !this.editorEnabled);
+    $scope.editorEnabled = false;
+    $scope.toggleEditor = () => ($scope.editorEnabled = !$scope.editorEnabled);
 ```
 
 e.g.:
@@ -1326,12 +1282,12 @@ app.component('recipeDetail', {
     $http.get('api/recipes/' + $routeParams.recipeId).then(res => {
       ($scope.recipe = res.data);
     });
-    
+
     $scope.back = () => window.history.back();
-    
+
     $scope.editorEnabled = false;
     $scope.toggleEditor = () => ($scope.editorEnabled = !$scope.editorEnabled);
-    
+
     $scope.saveRecipe = (recipe, recipeid) => {
       $http.put('/api/recipes/' + recipeid, recipe).then(res => ($scope.editorEnabled = false));
     };
@@ -1340,3 +1296,78 @@ app.component('recipeDetail', {
 ```
 
 And test.
+
+## Notes
+
+## Adding an Image
+
+Implement an image switcher within our recipe details component.
+
+Note this entry in recipe1309.json: `"mainImageUrl": "lasagna-1.png",`
+
+Add to the template after the header:
+
+`<img ng-src="img/home/{{ $ctrl.recipe.mainImageUrl }}" />`
+
+We are creating an image switcher so we will create a new function in the recipe-detail component:
+
+```js
+controller: function RecipeDetailController($http, $routeParams) {
+  $http.get('data/' + $routeParams.recipeId + '.json').then(response => {
+    this.recipe = response.data;
+  });
+  this.setImage = imageUrl => (this.mainImageUrl = imageUrl);
+}
+```
+
+Followed by a call to the function _in the promise function_ to initialize the first image:
+
+```js
+controller: function RecipeDetailController($http, $routeParams) {
+  $http.get('data/' + $routeParams.recipeId + '.json').then(response => {
+    this.recipe = response.data;
+    this.setImage(this.recipe.images[3]);
+  });
+  this.setImage = imageUrl => (this.mainImageUrl = imageUrl);
+}
+```
+
+Note: changing the index in the setImage call doesn't work yet.
+
+And make the following change to the template, adding a class for styling and a source which uses the `mainImageUrl` variable we created in the controller:
+
+`<img ng-src="img/home/{{$ctrl.mainImageUrl}}" class="recipe-detail-image" />`
+
+(Note: we no longer need `"mainImageUrl": "images/home/lasagna-1.png",` in the json since we are now refering to the images array.)
+
+### ng-click
+
+Add a list of images to the template that we will click on to swap out the main image.
+
+Note the `ng-click` directive and its call to the setImage function we created earlier (this goes below the img tag):
+
+```html
+<ul class="recipe-thumbs">
+    <li ng-repeat="img in $ctrl.recipe.images">
+        <img ng-src="img/home/{{img}}" ng-click="$ctrl.setImage(img)" />
+    </li>
+</ul>
+```
+
+You should now be able to click on one of the images in the list to swap out the main image.
+
+Final refactored component:
+
+```js
+app.component('recipeDetail', {
+  templateUrl: '/includes/recipe.html',
+
+  controller: function RecipeDetailController($http, $routeParams) {
+    $http.get('data/' + $routeParams.recipeId + '.json').then(response => {
+      this.recipe = response.data;
+      this.setImage(this.recipe.images[3]);
+    });
+    this.setImage = imageUrl => (this.mainImageUrl = imageUrl);
+  }
+});
+```
