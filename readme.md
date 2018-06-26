@@ -1,4 +1,6 @@
-# V - Front End Frameworks, Angular Components
+# V - Front End Frameworks
+
+## Webpack and Angular Components
 
 `$npm i`
 
@@ -24,9 +26,9 @@ Note the dependencies.
   }
 ```
 
-We'll be using [Babel with Webpack](https://babeljs.io/docs/setup/#installation).
+We'll be using [Babel](https://babeljs.io/docs/setup/#installation) with [Webpack](https://webpack.js.org) using the basic concepts presented [here](https://webpack.js.org/concepts/).
 
-Create webpack.config.js:
+Create `webpack.config.js`:
 
 ```js
 const path = require('path');
