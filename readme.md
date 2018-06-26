@@ -1,4 +1,4 @@
-# V - Front End Frameowrks
+# V - Front End Frameworks, Angular Components
 
 `$npm i`
 
