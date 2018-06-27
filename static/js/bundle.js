@@ -41029,6 +41029,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var app = _angular2.default.module('foodApp', ['ngRoute', 'ngAnimate']);
 
+app.controller('NavController', function ($scope, $location) {
+  $scope.isActive = function (viewLocation) {
+    var active = viewLocation === $location.path();
+    return active;
+  };
+});
+
 app.config(function config($locationProvider, $routeProvider) {
   $routeProvider.when('/', {
     template: '<h1>Home</h1>'
