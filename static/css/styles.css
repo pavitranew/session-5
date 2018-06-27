@@ -1,4 +1,8 @@
 @import url("https://fonts.googleapis.com/css?family=Lobster");
+body {
+  margin: 0;
+}
+
 .wrap {
   background: #eee;
   max-width: 940px;
@@ -36,6 +40,44 @@
 h1 {
   font-family: lobster;
   color: #666;
+}
+
+ul li:nth-child(odd) {
+  background: #bada55;
+}
+
+.fade.ng-enter {
+  animation: 2s appear;
+}
+
+.fade.ng-leave {
+  animation: 0.5s disappear;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateX(-200px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes disappear {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    font-size: 0.75rem;
+  }
+  75% {
+    color: green;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
 }
 
 nav {
@@ -99,45 +141,14 @@ nav {
   font-size: 1.5em;
 }
 
-body {
-  margin: 0;
+button {
+  padding: 0.5rem 1rem;
+  background-color: #007eb6;
+  color: #fff;
 }
 
-ul li:nth-child(odd) {
-  background: #bada55;
-}
-
-.fade.ng-enter {
-  animation: 2s appear;
-}
-
-.fade.ng-leave {
-  animation: 0.5s disappear;
-}
-
-@keyframes appear {
-  from {
-    opacity: 0;
-    transform: translateX(-200px);
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes disappear {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    font-size: 0.75rem;
-  }
-  75% {
-    color: green;
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
+label, input {
+  display: block;
+  padding: 0.5rem;
 }
 /*# sourceMappingURL=styles.css.map */

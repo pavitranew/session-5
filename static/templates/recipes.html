@@ -1,11 +1,12 @@
 <div class="wrap">
   <ul>
-    <li ng-repeat="recipe in recipes">
+    <li ng-repeat="recipe in recipes" class="fade">
       <img ng-src="img/recipes/{{ recipe.image }}">
       <div>
         <h1><a href="recipes/{{ recipe._id }}">{{ recipe.title }}</a></h1>
         <p>{{ recipe.description }}</p>
       </div>
+      <span ng-click="deleteRecipe($index, recipe._id)">✖︎</span>
     </li>
   </ul>
 </div>
