@@ -1,5 +1,7 @@
 # V - Front End Frameworks
 
+Continued - start from [here](https://github.com/front-end-intermediate/session-5/tree/summer2018-done#the-navbar)
+
 ## Webpack and Angular Components
 
 `$npm i`
