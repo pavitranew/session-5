@@ -1,7 +1,7 @@
 {
   "name": "session-5",
   "version": "1.0.0",
-  "description": "",
+  "description": "`$npm i`",
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js",
@@ -20,18 +20,19 @@
   },
   "homepage": "https://github.com/front-end-intermediate/session-5#readme",
   "dependencies": {
-    "angular": "^1.6.2",
-    "angular-route": "^1.6.2",
+    "angular": "^1.7.3",
+    "angular-route": "^1.7.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
-    "mongoose": "^5.1.6"
+    "mongodb": "^3.1.4",
+    "mongoose": "^5.2.12"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
-    "concurrently": "^3.6.0",
-    "webpack": "^4.12.0",
+    "concurrently": "^3.6.1",
+    "webpack": "^4.17.1",
     "webpack-cli": "^3.0.8"
   }
 }
